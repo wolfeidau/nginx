@@ -21,8 +21,8 @@ node.set[:nginx][:src_binary]      = "#{node[:nginx][:install_path]}/sbin/nginx"
 node.set[:nginx][:configure_flags] = [
   "--prefix=#{node[:nginx][:install_path]}",
   "--conf-path=#{node[:nginx][:dir]}/nginx.conf",
-  "--http-log-path=#{node[:nginx][:log_dir]}",
-  "--error-log-path=#{node[:nginx][:log_dir]}"
+  "--http-log-path=#{node[:nginx][:log_dir]}/access.log",
+  "--error-log-path=#{node[:nginx][:log_dir]}/error.log"
 ] + node[:nginx][:modules].map { |the| "--with-http_#{the}_module" }
 
 # Add extra modules
