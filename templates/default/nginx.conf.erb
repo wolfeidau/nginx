@@ -1,7 +1,12 @@
 user <%= node[:nginx][:user] %>;
 worker_processes <%= node[:nginx][:worker_processes] %>;
 pid /var/run/nginx.pid;
+
+<% if node[:nginx][:extra_modules].include? "syslog" -%>
+syslog local6 nginx;
+<% else -%>
 error_log  <%= node[:nginx][:log_dir] %>/error.log;
+<% end %>
 worker_rlimit_nofile <%= node[:nginx][:worker_connections] * 2 %>;
 
 events {

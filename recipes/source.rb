@@ -3,31 +3,38 @@ package "libssl-dev"
 
 nginx_version = node[:nginx][:version]
 
+# Fetch the nginx tarball
+remote_file "#{Chef::Config[:file_cache_path]}/nginx-#{nginx_version}.tar.gz" do
+  source "http://nginx.org/download/nginx-#{nginx_version}.tar.gz"
+  action :create_if_missing
+end
+
+bash "extract_tarball" do
+  cwd Chef::Config[:file_cache_path]
+  # puts "cd nginx-#{nginx_version} && ./configure #{configure_flags}"
+  code "tar zxf nginx-#{nginx_version}.tar.gz"
+end
+
+# Set configure options
 node.set[:nginx][:install_path]    = "/opt/nginx-#{nginx_version}"
 node.set[:nginx][:src_binary]      = "#{node[:nginx][:install_path]}/sbin/nginx"
 node.set[:nginx][:configure_flags] = [
   "--prefix=#{node[:nginx][:install_path]}",
   "--conf-path=#{node[:nginx][:dir]}/nginx.conf"
-] + node[:nginx][:modules].map { |a| "--with-http_#{a}_module" }
+] + node[:nginx][:modules].map { |the| "--with-http_#{the}_module" }
 
-# Extra modules
+# Add extra modules
 node[:nginx][:extra_modules].each do |addon|
   send :"nginx_addon_#{addon}" 
 end
 
 configure_flags = node[:nginx][:configure_flags].join " "
 
-remote_file "#{Chef::Config[:file_cache_path]}/nginx-#{nginx_version}.tar.gz" do
-  source "http://nginx.org/download/nginx-#{nginx_version}.tar.gz"
-  action :create_if_missing
-end
-
 bash "compile_nginx_source" do
-  cwd Chef::Config[:file_cache_path]
-  puts "cd nginx-#{nginx_version} && ./configure #{configure_flags}"
+  cwd "#{Chef::Config[:file_cache_path]}/nginx-#{nginx_version}"
+  # puts "cd nginx-#{nginx_version} && ./configure #{configure_flags}"
   code <<-EOH
-    tar zxf nginx-#{nginx_version}.tar.gz
-    cd nginx-#{nginx_version} && ./configure #{configure_flags}
+    ./configure #{configure_flags}
     make && make install
   EOH
   creates node[:nginx][:src_binary]
