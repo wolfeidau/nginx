@@ -103,3 +103,14 @@ cookbook_file "#{node[:nginx][:dir]}/mime.types" do
   notifies :restart, resources(:service => "nginx"), :immediately
 end
 
+if node[:nginx][:extra_modules].include "passenger"
+  template "passenger.conf" do
+    path "#{node[:nginx][:dir]}/conf.d/passenger.conf"
+    source "passenger.conf.erb"
+    variables({
+      :passenger_root => `passenger-config --root`,
+      :passenger_ruby => "/usr/bin/ruby"
+    })
+    notifies :restart, resources(:service => "nginx"), :immediately                                                        
+  end
+end
