@@ -103,7 +103,7 @@ cookbook_file "#{node[:nginx][:dir]}/mime.types" do
   notifies :restart, resources(:service => "nginx"), :immediately
 end
 
-if node[:nginx][:extra_modules].include "passenger"
+if node[:nginx][:extra_modules].include? "passenger"
   template "passenger.conf" do
     path "#{node[:nginx][:dir]}/conf.d/passenger.conf"
     source "passenger.conf.erb"
