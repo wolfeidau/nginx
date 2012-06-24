@@ -1,2 +1,2 @@
-passenger_root <%= @passenger_root %>;
-passenger_ruby <%= @passenger_ruby %>;
+passenger_root <%= node[:nginx][:passenger_root] %>;
+passenger_ruby <%= node[:nginx][:passenger_ruby] %>;
