@@ -4,7 +4,7 @@ description "nginx http daemon"
 start on runlevel [2]
 stop on runlevel [016]
 
-env DAEMON=/opt/nginx-1.2.0/sbin/nginx
+env DAEMON=/opt/nginx-<%= node[:nginx][:version] %>/sbin/nginx
 
 console owner
 
